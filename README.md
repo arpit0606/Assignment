@@ -1,5 +1,5 @@
 # How to run
-This is a spring boot service build using maven. It uses spring-batch to read the log file and process in batch mode.
+This is a spring boot service build using maven. It uses spring-batch to read the log file and process in batch mode for non-interactive bulk processing
 Uses scheduler cron expression to trigger the batch job. 
 
 if using IDE to run 
