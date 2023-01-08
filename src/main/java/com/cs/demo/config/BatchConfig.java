@@ -89,22 +89,18 @@ public class BatchConfig {
             public Event process(LogEvent logEvent) throws Exception {
                 if(logEvent!=null){
                 	
-                	System.out.println("logEvent " + logEvent.getId()+": "+logEvent.getState()+": "+ logEvent.getTimestamp());
                 	String updatestartedRec = "update EVENT set EVENTSTARTTIME = ?, EVENTDURATION = ?, ALERT = ? where ID = ?";
                 	String updatfinishedRec = "update EVENT set EVENTENDTIME = ?, EVENTDURATION = ?, ALERT = ? where ID = ?";
                 	
+                	// query DB and chk if input logevent is already present
                 	List<Event> events=jdbcTemplate.query("SELECT * FROM EVENT WHERE ID ='"+logEvent.getId()+"'", new BeanPropertyRowMapper<Event>(Event.class));
                     if(events.size()==1) {
-                    	// validate if its finished/started accordingly fill/update duration and alert.
-                    	// use jdbctemplate to update
-                    	System.out.print("record already exist calculating duration and updating");
-                    	// 1. calculate duration 
-                    	
-                    	// 2. calculate flag
+                    	// if input log event is present, means either finished or started record is already processed and saved in database
+                    	// validate if record type is finished/started, calculate duration and set alert flag and update in database
                     	long duration=0l;
                     	String alert="false";
                     	if(logEvent.getState().equalsIgnoreCase("STARTED")) {
-							// update qury to update eventstarttime, eventduration, flag true if duration > 4 
+							// update query to update eventstarttime, eventduration, flag true if duration > 4 
                     		duration=CalculateDuration.calculate(events.get(0).getEventendtime(), logEvent.getTimestamp());
                     		if(duration>4) {
                     			alert="true";
@@ -118,9 +114,7 @@ public class BatchConfig {
                     		}
 							jdbcTemplate.update(updatfinishedRec, logEvent.getTimestamp(), Long.toString(duration), alert, logEvent.getId());
 						}
-                    	
-                    	
-                    	
+                  
                     }else {
                     	// use builder design pattern to create Event object
                     	Event event = null;
@@ -142,12 +136,9 @@ public class BatchConfig {
                             		, "false");
 						}
                     	
-                            
                             return event;
                     }
                     
-                    
-                    //}
                 }
                 return null;
             }

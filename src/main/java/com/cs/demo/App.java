@@ -24,7 +24,8 @@ public class App
     {
         SpringApplication.run(App.class, args);
     }
-      
+    
+    // this can also he exp0sed as endpoint and 
     @Scheduled(cron = "0 */1 * * * ?")
     public void perform() throws Exception
     {
