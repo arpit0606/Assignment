@@ -3,6 +3,8 @@ package com.cs.demo.config;
 import java.util.List;
 
 import javax.sql.DataSource;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -24,13 +26,17 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.cs.demo.config.eventListners.JobResultListener;
 import com.cs.demo.model.Event;
 import com.cs.demo.model.LogEvent;
 import com.cs.demo.util.CalculateDuration;
+
+import ch.qos.logback.classic.Logger;
  
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig {
+	private final Logger logger = (Logger) LoggerFactory.getLogger(BatchConfig.class);
 	
 	@Autowired
 	private DataSource dataSource;
@@ -40,8 +46,8 @@ public class BatchConfig {
  
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
- 
-    @Value("classPath:/input/logfile.txt")
+
+    @Value("${input.dir}")
     private Resource inputResource;
     
     @Autowired
@@ -56,6 +62,7 @@ public class BatchConfig {
         return jobBuilderFactory
                 .get("readTXTFileJob")
                 .incrementer(new RunIdIncrementer())
+                .listener(new JobResultListener())
                 .start(step())
                 .build();
     }
@@ -74,6 +81,7 @@ public class BatchConfig {
      
     @Bean
     public FlatFileItemReader<LogEvent> reader() {
+    	logger.info("------ Starting FlatFileItemReader------");
         return new FlatFileItemReaderBuilder<LogEvent>()
                 .name("fileReader")
                 .resource(inputResource)
@@ -84,15 +92,18 @@ public class BatchConfig {
 
     @Bean
     public ItemProcessor<LogEvent, Event> processor() {
+    	logger.info("------ Starting ItemProcessor------");
         return new ItemProcessor<LogEvent, Event>(){
             @Override
             public Event process(LogEvent logEvent) throws Exception {
+            	logger.info("Process Item ------"+logEvent.getId());
                 if(logEvent!=null){
                 	
                 	String updatestartedRec = "update EVENT set EVENTSTARTTIME = ?, EVENTDURATION = ?, ALERT = ? where ID = ?";
                 	String updatfinishedRec = "update EVENT set EVENTENDTIME = ?, EVENTDURATION = ?, ALERT = ? where ID = ?";
                 	
                 	// query DB and chk if input logevent is already present
+                	
                 	List<Event> events=jdbcTemplate.query("SELECT * FROM EVENT WHERE ID ='"+logEvent.getId()+"'", new BeanPropertyRowMapper<Event>(Event.class));
                     if(events.size()==1) {
                     	// if input log event is present, means either finished or started record is already processed and saved in database

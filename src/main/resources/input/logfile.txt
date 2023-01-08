@@ -4,5 +4,5 @@
 {"id":"eventa","state":"FINISHED","type":"APPLICATION_LOG","host":"1234","timestamp":1491377495217}
 {"id":"eventc","state":"STARTED","timestamp":1491377495210}
 {"id":"eventb","state":"FINISHED","timestamp":1491377495216}
-{"id":"eventd","state":"FINISHED","type":"APPLICATION_LOG","host":"1234","timestamp":1491377495217}
-{"id":"eventd","state":"STARTED","type":"APPLICATION_LOG","host":"1234","timestamp":1491377495227}
+{"id":"evente","state":"FINISHED","type":"APPLICATION_LOG","host":"1234","timestamp":1491377495217}
+{"id":"evente","state":"STARTED","type":"APPLICATION_LOG","host":"1234","timestamp":1491377495227}
