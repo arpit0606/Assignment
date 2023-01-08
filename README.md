@@ -6,5 +6,6 @@ if using IDE to run
 1. simply git clone
 2. import the maven project in IDE
 3. go to file App.java, right click and run . It will start the springboot application and the bacth job will be trigger every 1 min. (enhancement to be maid to trigger the batch job only in case of there is change in the directory/logfile using java nio.file.watchservice.
-To see the results of the batch job 
+To see the results of the batch job while springboot application is still running:
 4. go to http://localhost:8080/console/ and loginto h2 console using url='jdbc:h2:mem:testdb username='sa' password=<empty>
+   go to EVENT table and run query SELECT * FROM EVENT to see the full table. 
